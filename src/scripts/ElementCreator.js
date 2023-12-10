@@ -37,10 +37,13 @@ export function createElementWithClasses(elementTag, elementClassNames, ...attri
 }
 
 // ############################################################################################################################################################
-export const createContainer = function createContainer(classNames) {
+export const createContainer = function createContainer(classNames, id) {
   const container = createElement('div', undefined);
   if (classNames !== undefined) {
     container.setAttribute('class', classNames);
+  }
+  if (id !== undefined) {
+    container.setAttribute('id', id);
   }
 
   return container;
