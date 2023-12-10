@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Passion+One:wght@700&display=swap');
+@import 'material-symbols/rounded.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  .material-symbols-rounded {
+    font-variation-settings:
+      'FILL' 1,
+      'wght' 400,
+      'GRAD' 0,
+      'opsz' 24;
+  }
+}
+
+@layer components {
+  .custom-loader {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background:
+      radial-gradient(farthest-side, #fff 94%, #0000) top/8px 8px no-repeat,
+      conic-gradient(#0000 30%, #fff);
+    -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 8px), #000 0);
+    animation: s3 1s infinite linear;
+  }
+
+  @keyframes s3 {
+    100% {
+      transform: rotate(1turn);
+    }
+  }
+}
