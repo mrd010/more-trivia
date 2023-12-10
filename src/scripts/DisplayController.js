@@ -6,6 +6,7 @@ const showStartGameForm = function showStartANewGameForm() {
 };
 // ##############################################################
 const initialLoad = function initializeAppAndLoadLandingPage() {
+  document.documentElement.setAttribute('class', 'font-sans');
   // set body styles
   document.body.setAttribute(
     'class',
