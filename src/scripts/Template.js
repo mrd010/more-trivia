@@ -1,15 +1,10 @@
 import lists from './Lists';
-import {
-  createContainer,
-  createElementWithClasses,
-  createMaterialIcon,
-  appendChildren,
-} from './ElementCreator';
+import { createContainer, createElementWithClasses, appendChildren } from './ElementCreator';
 import styles from './Styles';
 // ###################################################
 class Template {
   // create start form #########################################
-  static #createStartForm() {
+  static createStartForm() {
     const formContainer = createContainer(
       'absolute z-10 rounded-lg w-full h-full grid items-center',
       'start-form-container'
@@ -69,10 +64,16 @@ class Template {
       ['name', 'category'],
       ['id', 'category']
     );
-    Object.entries(lists.categories).forEach((category) => {
-      const [value, text] = category;
-      const opt = createElementWithClasses('option', undefined, ['value', `${value}`]);
-      opt.textContent = text;
+
+    lists.categories.forEach((category, index) => {
+      let value;
+      if (category === 'Any Category') {
+        value = 'any';
+      } else {
+        value = index + 8;
+      }
+      const opt = createElementWithClasses('option', 'text-sm', ['value', `${value}`]);
+      opt.textContent = category;
       input.appendChild(opt);
     });
     appendChildren(inputField, [label, input]);
@@ -89,7 +90,7 @@ class Template {
     );
     Object.entries(lists.difficulties).forEach((difficulty) => {
       const [value, text] = difficulty;
-      const opt = createElementWithClasses('option', undefined, ['value', `${value}`]);
+      const opt = createElementWithClasses('option', 'text-sm', ['value', `${value}`]);
       opt.textContent = text;
       input.appendChild(opt);
     });
@@ -130,6 +131,7 @@ class Template {
       'rounded-lg border-2 mx-2 hover:bg-slate-100/25 active:bg-slate-100 focus:bg-slate-100/25 active:text-slate-950 active:border-slate-950 font-bold transition-colors md:text-xl md:w-3/5 py-2',
       ['id', 'start-game-button']
     );
+    startBtn.textContent = 'Start';
     appendChildren(header, [title, startBtn]);
 
     container.appendChild(header);
