@@ -11,7 +11,7 @@ class Template {
     );
     const startForm = createElementWithClasses(
       'form',
-      'grid bg-slate-100 gap-2 px-2 py-4 rounded-md text-slate-950 w-4/5 mx-auto max-w-md',
+      'grid bg-slate-100 gap-2 px-2 py-4 transition-transform rounded-md text-slate-950 w-4/5 mx-auto max-w-md',
       ['action', '#']
     );
     // close button
@@ -47,10 +47,12 @@ class Template {
       styles.inputStyle,
       ['type', 'number'],
       ['id', 'number-of-questions'],
+      ['name', 'number-of-questions'],
       ['min', '1'],
       ['max', '50'],
       ['step', '1'],
-      ['value', '10']
+      ['value', '10'],
+      ['required', true]
     );
     appendChildren(inputField, [label, input]);
     startForm.appendChild(inputField);
@@ -62,7 +64,9 @@ class Template {
       'select',
       styles.inputStyle,
       ['name', 'category'],
-      ['id', 'category']
+      ['id', 'category'],
+      ['name', 'category'],
+      ['required', true]
     );
 
     lists.categories.forEach((category, index) => {
@@ -86,7 +90,8 @@ class Template {
       'select',
       styles.inputStyle,
       ['name', 'difficulty'],
-      ['id', 'difficulty']
+      ['id', 'difficulty'],
+      ['required', true]
     );
     Object.entries(lists.difficulties).forEach((difficulty) => {
       const [value, text] = difficulty;
@@ -118,7 +123,7 @@ class Template {
     // create header (page title)
     const header = createElementWithClasses(
       'header',
-      'grid md:justify-items-center gap-4 place-content-center'
+      'grid md:justify-items-center gap-4 place-content-center transition-opacity'
     );
     const title = createElementWithClasses(
       'h1',
