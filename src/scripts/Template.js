@@ -1,15 +1,19 @@
-import lists from './lists';
+import lists from './Lists';
 import {
   createContainer,
   createElementWithClasses,
   createMaterialIcon,
   appendChildren,
 } from './ElementCreator';
-import styles from './styles';
+import styles from './Styles';
 // ###################################################
 class Template {
   // create start form #########################################
-  static createStartForm() {
+  static #createStartForm() {
+    const formContainer = createContainer(
+      'absolute z-10 rounded-lg w-full h-full grid items-center',
+      'start-form-container'
+    );
     const startForm = createElementWithClasses(
       'form',
       'grid bg-slate-100 gap-2 px-2 py-4 rounded-md text-slate-950 w-4/5 mx-auto max-w-md',
@@ -101,8 +105,9 @@ class Template {
     submitBtn.textContent = 'Start';
     inputField.appendChild(submitBtn);
     startForm.appendChild(submitBtn);
+    formContainer.appendChild(startForm);
 
-    return startForm;
+    return formContainer;
   }
 
   // create landing page #########################################
@@ -127,15 +132,7 @@ class Template {
     );
     appendChildren(header, [title, startBtn]);
 
-    // create start game form
-    const formContainer = createContainer(
-      'absolute z-10 rounded-lg w-full h-full grid items-center',
-      'start-form-container'
-    );
-    const startForm = this.createStartForm();
-    formContainer.appendChild(startForm);
-    // append all
-    appendChildren(container, [header, formContainer]);
+    container.appendChild(header);
     return container;
   }
 }
