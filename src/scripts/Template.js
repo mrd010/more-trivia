@@ -47,7 +47,7 @@ class Template {
       styles.inputStyle,
       ['type', 'number'],
       ['id', 'number-of-questions'],
-      ['name', 'number-of-questions'],
+      ['name', 'amount'],
       ['min', '1'],
       ['max', '50'],
       ['step', '1'],

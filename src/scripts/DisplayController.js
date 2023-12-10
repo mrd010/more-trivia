@@ -1,4 +1,5 @@
 import Template from './Template';
+import Trivia from './Trivia';
 
 // ##############################################################
 const closeStartGameForm = function closeStartANewGameForm() {
@@ -34,7 +35,11 @@ const showStartGameForm = function showStartANewGameForm() {
   startGameForm.querySelector('form').addEventListener('submit', (e) => {
     e.preventDefault();
     const formData = Array.from(new FormData(e.target));
-    console.log(formData);
+    const amount = formData[0][1];
+    const category = formData[1][1];
+    const difficulty = formData[2][1];
+
+    Trivia.getTriviaData(amount, category, difficulty);
   });
 };
 // ##############################################################
