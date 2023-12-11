@@ -1,6 +1,7 @@
 import sleep from './Sleep';
 import Template from './Template';
 import TriviaAPI from './TriviaAPI';
+import { getGameData, getNextQuestion, initiateGame } from './TriviaGameHandler';
 
 let isLoading;
 // ##############################################################
@@ -64,6 +65,15 @@ const goToGamePhase = async function goToGamePhase() {
   await sleep(exitDuration * 1000 + 10);
   landingPage.remove();
   // show game phase template
+  document.body.appendChild(Template.createGameTemplate());
+};
+
+// ##############################################################
+const showNextQuestion = function showNextQuestion() {
+  const question = getNextQuestion();
+  console.log(question);
+
+  const questionContainer = Template.createQuestionContainer(question);
 };
 
 // ##############################################################
@@ -99,10 +109,12 @@ const showStartGameForm = function showStartANewGameForm() {
     const difficulty = formData[2][1];
 
     showFormLoading();
-    const receivedGameData = await TriviaAPI.startTriviaGame(amount, category, difficulty);
+    const receivedGameData = await getGameData(amount, category, difficulty);
     hideFormLoading();
     if (receivedGameData) {
-      goToGamePhase();
+      await goToGamePhase();
+      initiateGame();
+      showNextQuestion();
     }
   });
 };
