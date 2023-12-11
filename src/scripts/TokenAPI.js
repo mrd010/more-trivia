@@ -11,11 +11,9 @@ class TokenAPI {
       const previousToken = loadToken();
       if (previousToken) {
         this.#token = previousToken;
-        console.log('token loaded from storage');
       } else {
         this.#token = await this.#getNewToken();
         saveToken(this.#token);
-        console.log('new token created');
       }
     }
     return this.#token;
@@ -43,7 +41,6 @@ class TokenAPI {
           mode: 'cors',
         }
       );
-      console.log(response);
       if (!response.ok || response.status !== 200) {
         throw new Error(response.statusText);
       }

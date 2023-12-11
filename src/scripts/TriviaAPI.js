@@ -98,10 +98,8 @@ class TriviaAPI {
       }
 
       const triviaData = await this.#fetchTriviaData(amount, category, difficulty, token);
-      console.log(triviaData);
       return true;
     } catch (error) {
-      console.error(error);
       return false;
     }
   }

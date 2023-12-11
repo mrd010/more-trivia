@@ -9,6 +9,3 @@ export const loadToken = function loadToken() {
 export const removeToken = function removeToken() {
   localStorage.removeItem('token');
 };
-
-export const saveOptions = function saveOptions(amount, category, difficulty) {};
-export const loadOptions = function loadOptions() {};
