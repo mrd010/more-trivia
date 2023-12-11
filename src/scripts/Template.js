@@ -30,7 +30,7 @@ class Template {
     startForm.appendChild(closeBtn);
     // loading container
     const loading = createContainer(
-      'w-full hidden h-full fixed top-0 left-0 grid items-center justify-center bg-slate-900/25 backdrop-blur-[2px]',
+      'w-full hidden h-full z-20 fixed top-0 left-0 grid items-center justify-center bg-slate-900/25 backdrop-blur-[2px]',
       'start-loading'
     );
     const loader = createContainer('custom-loader');
@@ -121,7 +121,10 @@ class Template {
   // create landing page #########################################
   static createLandingPage() {
     // create main container
-    const container = createContainer('grid place-content-center w-full h-full', 'landing-page');
+    const container = createContainer(
+      'grid place-content-center w-full h-full transition-opacity',
+      'landing-page'
+    );
     // create header (page title)
     const header = createElementWithClasses(
       'header',
@@ -144,6 +147,9 @@ class Template {
     container.appendChild(header);
     return container;
   }
+
+  // ########################################################
+  static createGameTemplate = function createGameTemplate() {};
 }
 
 export default Template;

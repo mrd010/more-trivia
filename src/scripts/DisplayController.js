@@ -1,3 +1,4 @@
+import sleep from './Sleep';
 import Template from './Template';
 import TriviaAPI from './TriviaAPI';
 
@@ -38,7 +39,7 @@ const setMaxAmountInput = async function setMaxAmountInput() {
   }
 };
 // ##############################################################
-const closeStartGameForm = function closeStartANewGameForm() {
+const closeStartGameForm = async function closeStartANewGameForm() {
   const startGameForm = document.getElementById('start-form-container');
   const form = startGameForm.querySelector('form');
   const exitDuration = Number(
@@ -47,16 +48,29 @@ const closeStartGameForm = function closeStartANewGameForm() {
   form.classList.remove('scale-y-100');
   document.querySelector('#landing-page header').classList.remove('opacity-0');
 
-  setTimeout(
-    () => {
-      startGameForm.remove();
-    },
-    exitDuration * 1000 + 10
-  );
+  await sleep(exitDuration * 1000 + 10);
+  startGameForm.remove();
+};
+
+// ##############################################################
+const goToGamePhase = async function goToGamePhase() {
+  // remove landing page
+  const landingPage = document.getElementById('landing-page');
+  await closeStartGameForm();
+  const exitDuration = getComputedStyle(landingPage)
+    .getPropertyValue('transition-duration')
+    .slice(0, -1);
+  landingPage.classList.add('opacity-0');
+  await sleep(exitDuration * 1000 + 10);
+  landingPage.remove();
+  // show game phase template
 };
 
 // ##############################################################
 const showStartGameForm = function showStartANewGameForm() {
+  if (isLoading) {
+    return;
+  }
   // show form
   const startGameForm = Template.createStartForm();
   const landingPage = document.getElementById('landing-page');
@@ -76,16 +90,19 @@ const showStartGameForm = function showStartANewGameForm() {
   // form submit event
   startGameForm.querySelector('form').addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (isLoading) {
+      return;
+    }
     const formData = Array.from(new FormData(e.target));
     const amount = formData[0][1];
     const category = formData[1][1];
     const difficulty = formData[2][1];
 
     showFormLoading();
-    const gameIsStarted = await TriviaAPI.startTriviaGame(amount, category, difficulty);
+    const receivedGameData = await TriviaAPI.startTriviaGame(amount, category, difficulty);
     hideFormLoading();
-    if (gameIsStarted) {
-      closeStartGameForm();
+    if (receivedGameData) {
+      goToGamePhase();
     }
   });
 };
