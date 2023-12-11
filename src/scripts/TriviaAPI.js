@@ -1,4 +1,3 @@
-import { saveToken, loadToken } from './StorageController';
 import TokenAPI from './TokenAPI';
 import CustomError from './CustomError';
 
@@ -33,30 +32,35 @@ class TriviaAPI {
 
   static async #errorHandler(code) {
     if (code === 1) {
-      throw new CustomError(
+      return new CustomError(
         'No Results',
         "Could not return results. The API doesn't have enough questions for your query."
       );
-    } else if (code === 2) {
-      throw new CustomError(
+    }
+    if (code === 2) {
+      return new CustomError(
         'Invalid Parameter',
         "Contains an invalid parameter. Arguments passed in aren't valid."
       );
-    } else if (code === 3) {
+    }
+    if (code === 3) {
       TokenAPI.deleteToken();
-      throw new CustomError('Token Not Found', 'Session Token does not exist.');
-    } else if (code === 4) {
+      return new CustomError('Token Not Found', 'Session Token does not exist.');
+    }
+    if (code === 4) {
       TokenAPI.resetToken();
-      throw new CustomError(
+      return new CustomError(
         'Token Empty',
         'Session Token has returned all possible questions for the specified query. Resetting the Token is necessary.'
       );
-    } else if (code === 5) {
-      throw new CustomError(
+    }
+    if (code === 5) {
+      return new CustomError(
         'Rate Limit',
         'Too many requests have occurred. Each IP can only access the API once every 5 seconds.'
       );
     }
+    return new Error('Something Strange happened');
   }
 
   // ##############################################################
@@ -78,7 +82,7 @@ class TriviaAPI {
     if (triviaData.response_code === 0) {
       return triviaData;
     }
-    this.#errorHandler(triviaData.response_code);
+    throw this.#errorHandler(triviaData.response_code);
   }
 
   // ##############################################################
