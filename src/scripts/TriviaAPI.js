@@ -2,8 +2,6 @@ import TokenAPI from './TokenAPI';
 import CustomError from './CustomError';
 
 class TriviaAPI {
-  static #settings;
-
   static #baseApiURL = 'https://opentdb.com/api.php';
 
   static #baseApiCategoryCountURL = 'https://opentdb.com/api_count.php';
@@ -64,7 +62,7 @@ class TriviaAPI {
   }
 
   // ##############################################################
-  static async #fetchTriviaData(amount, category, difficulty, token) {
+  static async fetchTriviaData(amount, category, difficulty, token) {
     const catOptionStr = category === 'any' ? '' : `&category=${category}`;
     const diffOptionStr = difficulty === 'any' ? '' : `&difficulty=${difficulty}`;
     const tokenOptionStr = token === undefined ? '' : `&token=${token}`;
@@ -86,32 +84,6 @@ class TriviaAPI {
   }
 
   // ##############################################################
-  static async startTriviaGame(amount, category, difficulty) {
-    try {
-      // get or create token
-      const token = await TokenAPI.getToken();
-
-      // check validity of amount entered
-      if (category !== 'any') {
-        const maxAllowedAmount = await this.getMaxAmount(category, difficulty);
-        if (maxAllowedAmount < amount) {
-          throw new Error(
-            `There is not enough questions with this settings. max allowed amount: ${maxAllowedAmount}`
-          );
-        }
-      }
-
-      const triviaData = await this.#fetchTriviaData(amount, category, difficulty, token);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
-
-  // ##############################################################
-  static setSettings(amount, category, difficulty) {
-    this.#settings = { amount, category, difficulty };
-  }
 }
 
 export default TriviaAPI;
