@@ -149,7 +149,62 @@ class Template {
   }
 
   // ########################################################
-  static createGameTemplate = function createGameTemplate() {};
+  static createGameTemplate = function createGameTemplate() {
+    const container = createContainer(
+      'grid grid-rows-[auto_minmax(0,1fr)_auto] gap-10 h-screen sm:p-5'
+    );
+    // restart button
+    const btnContainer = createContainer('grid sm:place-self-end');
+    const restartBtn = createElementWithClasses(
+      'button',
+      'p-2 m-2 font-bold rounded-lg bg-blue-900/25 shadow-sm sm:px-4 md:text-lg lg:text-xl lg:px-6 hover:bg-blue-900/40 active:bg-sky-800/50 transition-colors',
+      ['id', 'restart-game']
+    );
+    restartBtn.textContent = 'Restart';
+    btnContainer.appendChild(restartBtn);
+
+    // questions container
+    const questionContainer = createContainer(
+      'grid mx-4 max-h-full col-start-1 col-end-1 row-start-2 row-end-3 grid-rows-2',
+      'questions-container'
+    );
+
+    // progress bar
+    const progressBar = createContainer('grid m-2 grid-cols-5 rounded-full gap-1', 'progress-bar');
+    appendChildren(container, [btnContainer, questionContainer, progressBar]);
+
+    return container;
+  };
+
+  // ########################################################
+  static createMultipleOptions = function createMultipleOptions(correctAnswer, incorrectAnswers) {};
+
+  // ########################################################
+  static createBooleanOptions = function createBooleanOptions(correctAnswer, incorrectAnswer) {};
+
+  // ########################################################
+  static createQuestionContainer = function createQuestionContainer([index, triviaItem]) {
+    const questionContainer = createContainer(
+      'grid mx-4 max-h-full col-start-1 col-end-1 row-start-2 row-end-3 grid-rows-2',
+      'question'
+    );
+    const questionDesc = createContainer(
+      'bg-slate-200/10 relative rounded-2xl max-h-full px-2 py-6 lg:p-10 gap-1 grid lg:mx-[10%]'
+    );
+    const questionNumber = createElementWithClasses(
+      'span',
+      'font-bold px-4 py-1 text-xl bg-slate-50 text-slate-800 w-12 h-12 grid place-content-center italic rounded-full absolute top-0 left-10 lg:left-20 -translate-y-2/4 -translate-x-2/4 lg:w-20 lg:h-20 lg:text-3xl',
+      ['id', 'index']
+    );
+    questionNumber.textContent = `#${index} ${triviaItem.category}`;
+    const questionText = createElementWithClasses(
+      'p',
+      'text-center overflow-y-auto font-medium text-lg px-6 pt-6 sm:text-2xl md:text-3xl lg:leading-normal max-h-full'
+    );
+    questionText.textContent = triviaItem.question;
+    appendChildren(questionDesc, [questionNumber, questionText]);
+    questionContainer.appendChild(questionDesc);
+  };
 }
 
 export default Template;
