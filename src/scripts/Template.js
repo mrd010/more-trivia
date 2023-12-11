@@ -15,10 +15,12 @@ class Template {
       ['action', '#']
     );
     // close button
-    const closeBtn = createElementWithClasses('button', 'justify-self-end mr-2 text-slate-800', [
-      'id',
-      'close-form',
-    ]);
+    const closeBtn = createElementWithClasses(
+      'button',
+      'justify-self-end mr-2 text-slate-800',
+      ['type', 'button'],
+      ['id', 'close-form']
+    );
     const closeBtnIcon = createElementWithClasses(
       'span',
       'material-symbols-rounded bg-slate-300/25 hover:bg-slate-400/25 active:bg-slate-600/25 transition-colors rounded-full p-1'
