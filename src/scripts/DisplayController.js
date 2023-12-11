@@ -1,6 +1,42 @@
 import Template from './Template';
-import Trivia from './Trivia';
+import TriviaAPI from './TriviaAPI';
 
+let isLoading;
+// ##############################################################
+const showFormLoading = function showFormLoading() {
+  if (!isLoading) {
+    isLoading = true;
+    document.getElementById('start-loading').classList.remove('hidden');
+  }
+};
+// ##############################################################
+const hideFormLoading = function hideFormLoading() {
+  if (isLoading) {
+    document.getElementById('start-loading').classList.add('hidden');
+    isLoading = false;
+  }
+};
+// ##############################################################
+const displayError = function displayError(error) {
+  console.error(error);
+};
+// ##############################################################
+const setMaxAmountInput = async function setMaxAmountInput() {
+  const category = document.getElementById('category').value;
+  const difficulty = document.getElementById('difficulty').value;
+  try {
+    showFormLoading();
+    let maxAllowedAmount = await TriviaAPI.getMaxAmount(category, difficulty);
+    hideFormLoading();
+    maxAllowedAmount = Math.min(maxAllowedAmount, 50);
+    const amount = document.getElementById('number-of-questions');
+    amount.setAttribute('max', maxAllowedAmount);
+    const currentValue = amount.value;
+    amount.value = Math.min(maxAllowedAmount, currentValue);
+  } catch (error) {
+    displayError(error);
+  }
+};
 // ##############################################################
 const closeStartGameForm = function closeStartANewGameForm() {
   const startGameForm = document.getElementById('start-form-container');
@@ -18,6 +54,7 @@ const closeStartGameForm = function closeStartANewGameForm() {
     exitDuration * 1000 + 10
   );
 };
+
 // ##############################################################
 const showStartGameForm = function showStartANewGameForm() {
   // show form
@@ -31,15 +68,25 @@ const showStartGameForm = function showStartANewGameForm() {
   }, 10);
 
   // add events
+  // close form event
   document.getElementById('close-form').addEventListener('click', closeStartGameForm);
-  startGameForm.querySelector('form').addEventListener('submit', (e) => {
+  // change input event
+  startGameForm.querySelector('#category').addEventListener('change', setMaxAmountInput);
+  startGameForm.querySelector('#difficulty').addEventListener('change', setMaxAmountInput);
+  // form submit event
+  startGameForm.querySelector('form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = Array.from(new FormData(e.target));
     const amount = formData[0][1];
     const category = formData[1][1];
     const difficulty = formData[2][1];
 
-    Trivia.getTriviaData(amount, category, difficulty);
+    showFormLoading();
+    const gameIsStarted = await TriviaAPI.startTriviaGame(amount, category, difficulty);
+    hideFormLoading();
+    if (gameIsStarted) {
+      closeStartGameForm();
+    }
   });
 };
 // ##############################################################
@@ -51,6 +98,7 @@ const initialLoad = function initializeAppAndLoadLandingPage() {
     'bg-slate-950 w-screen h-screen text-slate-50 grid items-center'
   );
   //   load landing page
+  isLoading = false;
   const landingPage = Template.createLandingPage();
   document.body.appendChild(landingPage);
 
