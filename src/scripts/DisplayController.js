@@ -1,9 +1,18 @@
+/* eslint-disable import/no-cycle */
 import sleep from './Sleep';
 import Template from './Template';
 import TriviaAPI from './TriviaAPI';
-import { getGameData, getNextQuestion, initiateGame } from './TriviaGameHandler';
+import {
+  checkAnswer,
+  getCurrentIndex,
+  getGameData,
+  getNextQuestion,
+  initiateGame,
+} from './TriviaGameHandler';
 
 let isLoading;
+let answerClicked;
+
 // ##############################################################
 const showFormLoading = function showFormLoading() {
   if (!isLoading) {
@@ -66,6 +75,30 @@ const goToGamePhase = async function goToGamePhase() {
   landingPage.remove();
   // show game phase template
   document.body.appendChild(Template.createGameTemplate());
+
+  // SHOULD ADD RESTART BUTTON EVENT
+};
+// ##############################################################
+const displayAnswer = function displayAnswer() {
+  if (!answerClicked) {
+    answerClicked = true;
+    const chosenAnswer = this.getAttribute('data-value');
+    const chosenAnswerIsCorrect = checkAnswer(chosenAnswer);
+    if (chosenAnswerIsCorrect) {
+      this.setAttribute('data-answer', 'correct');
+    } else {
+      this.setAttribute('data-answer', 'wrong');
+    }
+    document.querySelectorAll('#options button').forEach((answerBtn) => {
+      answerBtn.setAttribute('disabled', '');
+      if (answerBtn !== this) {
+        answerBtn.removeAttribute('data-answer');
+        if (!chosenAnswerIsCorrect && checkAnswer(answerBtn.getAttribute('data-value'))) {
+          answerBtn.setAttribute('data-answer', 'correct');
+        }
+      }
+    });
+  }
 };
 
 // ##############################################################
@@ -73,8 +106,14 @@ const showNextQuestion = function showNextQuestion() {
   const question = getNextQuestion();
   console.log(question);
 
-  const questionContainer = Template.createQuestionContainer(question);
+  // create question page
+  const questionContainer = Template.createQuestionContainer(getCurrentIndex(), question);
   document.getElementById('restart').insertAdjacentElement('afterend', questionContainer);
+  answerClicked = false;
+  // event listeners
+  document.querySelectorAll('#options button').forEach((answerBtn) => {
+    answerBtn.addEventListener('click', displayAnswer, { once: true });
+  });
 };
 
 // ##############################################################

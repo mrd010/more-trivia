@@ -1,6 +1,12 @@
 import lists from './Lists';
-import { createContainer, createElementWithClasses, appendChildren } from './ElementCreator';
+import {
+  createContainer,
+  createElementWithClasses,
+  appendChildren,
+  HTMLtoText,
+} from './ElementCreator';
 import styles from './Styles';
+
 // ###################################################
 class Template {
   // create start form #########################################
@@ -170,46 +176,75 @@ class Template {
     );
 
     // progress bar
-    const progressBar = createContainer('grid m-2 grid-cols-5 rounded-full gap-1', 'progress-bar');
-    appendChildren(container, [btnContainer, questionContainer, progressBar]);
+    const progressBarContainer = createContainer(
+      'w-auto mx-4 bg-slate-200 rounded-full h-2.5 mb-4 grid'
+    );
+    const progressBar = createContainer('bg-blue-600 h-2.5 transition-[width] rounded-ful');
+    progressBar.style.width = '0%';
+    appendChildren(container, [btnContainer, questionContainer, progressBarContainer]);
 
     return container;
   }
 
   // ########################################################
-  static #createMultipleOptions(correctAnswer, incorrectAnswers) {}
+  static #createMultipleOptions(correctAnswer, incorrectAnswers) {
+    const optionsContainer = createElementWithClasses(
+      'div',
+      'grid gap-4 content-center p-2 my-4 lg:w-[50%] lg:mx-auto lg:grid-cols-2',
+      ['id', 'options']
+    );
+    const answers = incorrectAnswers;
+
+    const randomIndex = Math.floor(Math.random() * 4);
+    answers.splice(randomIndex, 0, correctAnswer);
+    answers.forEach((answer) => {
+      const answerBtn = createElementWithClasses(
+        'button',
+        styles.multipleAnswerBtnStyle,
+        ['data-answer', 'na'],
+        ['data-value', `${HTMLtoText(answer)}`]
+      );
+      answerBtn.textContent = HTMLtoText(answer);
+      optionsContainer.appendChild(answerBtn);
+    });
+    return optionsContainer;
+  }
 
   // ########################################################
-  static #createBooleanOptions(correctAnswer, incorrectAnswer) {
-    const optionsContainer = createContainer(
-      'grid grid-cols-2 gap-4 content-center p-4 lg:grid-cols-1 lg:grid-rows-[auto_auto] lg:w-[33%] lg:mx-auto'
+  static #createBooleanOptions() {
+    const optionsContainer = createElementWithClasses(
+      'div',
+      'grid grid-cols-2 gap-4 content-center p-4 lg:grid-cols-1 lg:grid-rows-[auto_auto] lg:w-[33%] lg:mx-auto',
+      ['id', 'options']
     );
     // true button
     const trueBtn = createElementWithClasses(
       'button',
-      'grid h-20 cursor-pointer place-items-center rounded-xl border-2 bg-slate-900 text-center text-lg font-bold capitalize shadow-inner transition-colors hover:bg-green-600/10 active:bg-slate-50/40 data-correct:border-green-600 data-correct:bg-green-600 data-wrong:border-red-500 data-wrong:bg-red-700 data-na:hover:border-green-500 sm:text-2xl lg:w-full',
-      ['data-answer', 'na']
+      styles.booleanAnswerBtnStyle,
+      ['data-answer', 'na'],
+      ['data-value', 'True']
     );
     trueBtn.textContent = 'True';
     // false button
     const falseBtn = createElementWithClasses(
       'button',
-      'grid h-20 cursor-pointer place-items-center rounded-xl border-2 bg-slate-900 text-center text-lg font-bold capitalize shadow-inner transition-colors hover:bg-green-600/10 active:bg-slate-50/40 data-correct:border-green-600 data-correct:bg-green-600 data-wrong:border-red-500 data-wrong:bg-red-700 data-na:hover:border-green-500 sm:text-2xl lg:w-full',
-      ['data-answer', 'na']
+      styles.booleanAnswerBtnStyle,
+      ['data-answer', 'na'],
+      ['data-value', 'False']
     );
     falseBtn.textContent = 'False';
 
     appendChildren(optionsContainer, [trueBtn, falseBtn]);
-    console.log(optionsContainer);
     return optionsContainer;
   }
 
   // ########################################################
-  static createQuestionContainer([index, triviaItem]) {
-    const questionContainer = createContainer(
-      'grid mx-4 max-h-full col-start-1 col-end-1 row-start-2 row-end-3 grid-rows-2',
-      'question'
-    );
+  static createQuestionContainer(index, triviaItem) {
+    // const questionContainer = createContainer(
+    //   'grid mx-4 max-h-full col-start-1 col-end-1 row-start-2 row-end-3 grid-rows-2',
+    //   'question'
+    // );
+    const questionContainer = document.getElementById('questions-container');
     // question details
     const questionDesc = createContainer(
       'bg-slate-200/10 relative rounded-2xl max-h-full px-2 py-6 lg:p-10 gap-1 grid lg:mx-[10%]'
@@ -220,10 +255,7 @@ class Template {
       ['id', 'index']
     );
     questionNumber.textContent = `#${index + 1}`;
-    const questionText = createElementWithClasses(
-      'p',
-      'text-center overflow-y-auto font-medium text-lg px-6 pt-6 sm:text-2xl md:text-3xl lg:leading-normal max-h-full'
-    );
+    const questionText = createElementWithClasses('p', styles.questionTextStyle);
     questionText.innerHTML = triviaItem.question.toString();
     appendChildren(questionDesc, [questionNumber, questionText]);
     questionContainer.appendChild(questionDesc);
@@ -231,9 +263,11 @@ class Template {
     let optionsContainer = createContainer();
 
     if (triviaItem.type === 'boolean') {
-      optionsContainer = this.#createBooleanOptions(
+      optionsContainer = this.#createBooleanOptions();
+    } else if (triviaItem.type === 'multiple') {
+      optionsContainer = this.#createMultipleOptions(
         triviaItem.correct_answer,
-        triviaItem.incorrect_answers[0]
+        triviaItem.incorrect_answers
       );
     }
 
