@@ -1,10 +1,5 @@
 import lists from './Lists';
-import {
-  createContainer,
-  createElementWithClasses,
-  appendChildren,
-  HTMLtoText,
-} from './ElementCreator';
+import { createContainer, createElementWithClasses, appendChildren } from './ElementCreator';
 import styles from './Styles';
 
 // ###################################################
@@ -17,7 +12,7 @@ class Template {
     );
     const startForm = createElementWithClasses(
       'form',
-      'grid bg-slate-100 gap-2 px-2 py-4 transition-transform rounded-md text-slate-950 w-4/5 mx-auto max-w-md',
+      'grid bg-slate-100 gap-2 px-2 py-4 transition-transform duration-500 rounded-md text-slate-950 w-4/5 mx-auto max-w-md',
       ['action', '#']
     );
     // close button
@@ -128,7 +123,7 @@ class Template {
   static createLandingPage() {
     // create main container
     const container = createContainer(
-      'grid place-content-center w-full h-full transition-opacity',
+      'grid place-content-center w-full h-full duration-500 transition-opacity opacity-100',
       'landing-page'
     );
     // create header (page title)
@@ -157,7 +152,7 @@ class Template {
   // ########################################################
   static createGameTemplate() {
     const container = createContainer(
-      'grid grid-rows-[auto_minmax(0,1fr)_auto] gap-10 h-screen sm:p-5',
+      'grid grid-rows-[auto_minmax(0,1fr)_auto] gap-10 h-screen sm:p-5 duration-500 transition-opacity opacity-0',
       'gameContainer'
     );
     // restart button
@@ -179,8 +174,12 @@ class Template {
     const progressBarContainer = createContainer(
       'w-auto mx-4 bg-slate-200 rounded-full h-2.5 mb-4 grid'
     );
-    const progressBar = createContainer('bg-blue-600 h-2.5 transition-[width] rounded-ful');
+    const progressBar = createContainer(
+      'bg-blue-600 h-2.5 transition-[width] duration-1000 delay-200 rounded-full',
+      'progress-bar'
+    );
     progressBar.style.width = '0%';
+    progressBarContainer.appendChild(progressBar);
     appendChildren(container, [btnContainer, questionContainer, progressBarContainer]);
 
     return container;
@@ -202,9 +201,9 @@ class Template {
         'button',
         styles.multipleAnswerBtnStyle,
         ['data-answer', 'na'],
-        ['data-value', `${HTMLtoText(answer)}`]
+        ['data-value', `${answer}`]
       );
-      answerBtn.textContent = HTMLtoText(answer);
+      answerBtn.textContent = answer;
       optionsContainer.appendChild(answerBtn);
     });
     return optionsContainer;
@@ -240,11 +239,11 @@ class Template {
 
   // ########################################################
   static createQuestionContainer(index, triviaItem) {
-    // const questionContainer = createContainer(
-    //   'grid mx-4 max-h-full col-start-1 col-end-1 row-start-2 row-end-3 grid-rows-2',
-    //   'question'
-    // );
-    const questionContainer = document.getElementById('questions-container');
+    const questionContainer = createContainer(
+      'grid mx-4 max-h-full col-start-1 col-end-1 duration-1000 ease-in-out row-start-2 row-end-3 grid-rows-2 opacity-0 transition-opacity',
+      'questions-container'
+    );
+
     // question details
     const questionDesc = createContainer(
       'bg-slate-200/10 relative rounded-2xl max-h-full px-2 py-6 lg:p-10 gap-1 grid lg:mx-[10%]'

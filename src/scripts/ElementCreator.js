@@ -1,3 +1,5 @@
+export const isOverflown = ({ clientWidth, clientHeight, scrollWidth, scrollHeight }) =>
+  scrollHeight > clientHeight || scrollWidth > clientWidth;
 // ##############################################################
 export const HTMLtoText = function HTMLtoText(htmlCode) {
   const tempDiv = document.createElement('div');

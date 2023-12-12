@@ -1,4 +1,5 @@
 /* eslint-disable import/no-cycle */
+import { isOverflown } from './ElementCreator';
 import sleep from './Sleep';
 import Template from './Template';
 import TriviaAPI from './TriviaAPI';
@@ -7,11 +8,14 @@ import {
   getCurrentIndex,
   getGameData,
   getNextQuestion,
+  getNumberOfQuestions,
   initiateGame,
+  playerChose,
 } from './TriviaGameHandler';
 
 let isLoading;
 let answerClicked;
+let gameStarted;
 
 // ##############################################################
 const showFormLoading = function showFormLoading() {
@@ -67,49 +71,90 @@ const goToGamePhase = async function goToGamePhase() {
   // remove landing page
   const landingPage = document.getElementById('landing-page');
   await closeStartGameForm();
-  const exitDuration = getComputedStyle(landingPage)
-    .getPropertyValue('transition-duration')
-    .slice(0, -1);
+  let trTime = getComputedStyle(landingPage).getPropertyValue('transition-duration').slice(0, -1);
   landingPage.classList.add('opacity-0');
-  await sleep(exitDuration * 1000 + 10);
+  landingPage.classList.remove('opacity-100');
+  await sleep(trTime * 2 * 1000 + 10);
   landingPage.remove();
   // show game phase template
-  document.body.appendChild(Template.createGameTemplate());
+  const gameTemplate = Template.createGameTemplate();
+  document.body.appendChild(gameTemplate);
+  await sleep(10);
+  gameTemplate.classList.add('opacity-100');
+  trTime = getComputedStyle(gameTemplate).getPropertyValue('transition-duration').slice(0, -1);
+  await sleep(trTime * 1000 + 10);
 
   // SHOULD ADD RESTART BUTTON EVENT
 };
+
 // ##############################################################
-const displayAnswer = function displayAnswer() {
-  if (!answerClicked) {
-    answerClicked = true;
-    const chosenAnswer = this.getAttribute('data-value');
-    const chosenAnswerIsCorrect = checkAnswer(chosenAnswer);
-    if (chosenAnswerIsCorrect) {
-      this.setAttribute('data-answer', 'correct');
-    } else {
-      this.setAttribute('data-answer', 'wrong');
-    }
-    document.querySelectorAll('#options button').forEach((answerBtn) => {
-      answerBtn.setAttribute('disabled', '');
-      if (answerBtn !== this) {
-        answerBtn.removeAttribute('data-answer');
-        if (!chosenAnswerIsCorrect && checkAnswer(answerBtn.getAttribute('data-value'))) {
-          answerBtn.setAttribute('data-answer', 'correct');
-        }
+const updateProgressBar = function updateProgressBar() {
+  const progressBar = document.getElementById('progress-bar');
+  progressBar.style.width = `${Math.round(
+    ((getCurrentIndex() + 1) / getNumberOfQuestions()) * 100
+  )}%`;
+};
+// ##############################################################
+const showNextQuestion = async function showNextQuestion() {
+  let questionContainer = document.getElementById('questions-container');
+  if (questionContainer) {
+    const trTime = getComputedStyle(questionContainer)
+      .getPropertyValue('transition-duration')
+      .slice(0, -1);
+    questionContainer.classList.add('opacity-0');
+    questionContainer.classList.remove('opacity-100');
+    await sleep(trTime * 1000 + 10);
+    questionContainer.remove();
+  }
+  const question = getNextQuestion();
+
+  // create question page
+  questionContainer = Template.createQuestionContainer(getCurrentIndex(), question);
+  document.getElementById('restart').insertAdjacentElement('afterend', questionContainer);
+  await sleep(20);
+  if (question.type === 'multiple') {
+    document.querySelectorAll('#options button').forEach((button) => {
+      if (isOverflown(button)) {
+        button.classList.remove('text-2xl');
+        button.classList.add('text-sm');
       }
     });
   }
-};
 
-// ##############################################################
-const showNextQuestion = function showNextQuestion() {
-  const question = getNextQuestion();
-  console.log(question);
+  questionContainer.classList.add('opacity-100');
 
-  // create question page
-  const questionContainer = Template.createQuestionContainer(getCurrentIndex(), question);
-  document.getElementById('restart').insertAdjacentElement('afterend', questionContainer);
   answerClicked = false;
+
+  // ##############################################################
+  const displayAnswer = async function displayAnswer() {
+    if (!answerClicked) {
+      answerClicked = true;
+      const chosenAnswer = this.getAttribute('data-value');
+      const chosenAnswerIsCorrect = playerChose(chosenAnswer);
+      let pulseTime = 0;
+      let pulseCount = 0;
+      if (chosenAnswerIsCorrect) {
+        this.setAttribute('data-answer', 'correct');
+      } else {
+        this.setAttribute('data-answer', 'wrong');
+        pulseTime = getComputedStyle(this).getPropertyValue('animation-duration').slice(0, -1);
+        pulseCount = getComputedStyle(this).getPropertyValue('animation-iteration-count');
+      }
+      document.querySelectorAll('#options button').forEach((answerBtn) => {
+        answerBtn.setAttribute('disabled', '');
+        if (answerBtn !== this) {
+          answerBtn.removeAttribute('data-answer');
+          if (!chosenAnswerIsCorrect && checkAnswer(answerBtn.getAttribute('data-value'))) {
+            answerBtn.setAttribute('data-answer', 'correct');
+          }
+        }
+      });
+      const trTime = Math.max(pulseTime * pulseCount * 1000, 1000);
+      await sleep(trTime + 500);
+      updateProgressBar();
+      showNextQuestion();
+    }
+  };
   // event listeners
   document.querySelectorAll('#options button').forEach((answerBtn) => {
     answerBtn.addEventListener('click', displayAnswer, { once: true });
@@ -118,7 +163,7 @@ const showNextQuestion = function showNextQuestion() {
 
 // ##############################################################
 const showStartGameForm = function showStartANewGameForm() {
-  if (isLoading) {
+  if (isLoading || gameStarted) {
     return;
   }
   // show form
@@ -140,7 +185,7 @@ const showStartGameForm = function showStartANewGameForm() {
   // form submit event
   startGameForm.querySelector('form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (isLoading) {
+    if (isLoading || gameStarted) {
       return;
     }
     const formData = Array.from(new FormData(e.target));
@@ -152,9 +197,10 @@ const showStartGameForm = function showStartANewGameForm() {
     const receivedGameData = await getGameData(amount, category, difficulty);
     hideFormLoading();
     if (receivedGameData) {
+      gameStarted = true;
       await goToGamePhase();
       initiateGame();
-      showNextQuestion();
+      await showNextQuestion();
     }
   });
 };
@@ -168,6 +214,7 @@ const initialLoad = function initializeAppAndLoadLandingPage() {
   );
   //   load landing page
   isLoading = false;
+  gameStarted = false;
   const landingPage = Template.createLandingPage();
   document.body.appendChild(landingPage);
 
