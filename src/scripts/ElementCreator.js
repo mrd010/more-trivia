@@ -1,3 +1,10 @@
+// ##############################################################
+export const HTMLtoText = function HTMLtoText(htmlCode) {
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = htmlCode;
+  return tempDiv.textContent;
+};
+
 // ############################################################################################################################################################
 export function nameToId(name) {
   return name.toLowerCase().split(' ').join('-');
