@@ -74,6 +74,7 @@ const showNextQuestion = function showNextQuestion() {
   console.log(question);
 
   const questionContainer = Template.createQuestionContainer(question);
+  document.getElementById('restart').insertAdjacentElement('afterend', questionContainer);
 };
 
 // ##############################################################

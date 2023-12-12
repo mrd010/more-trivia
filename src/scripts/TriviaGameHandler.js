@@ -20,6 +20,7 @@ export const getGameData = async function getGameData(amount, category, difficul
     // get trivia data
     const triviaData = await TriviaAPI.fetchTriviaData(amount, category, difficulty, token);
 
+    console.log(triviaData);
     questions = triviaData.results.entries();
 
     return true;

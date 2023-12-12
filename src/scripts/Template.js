@@ -149,16 +149,16 @@ class Template {
   }
 
   // ########################################################
-  static createGameTemplate = function createGameTemplate() {
+  static createGameTemplate() {
     const container = createContainer(
-      'grid grid-rows-[auto_minmax(0,1fr)_auto] gap-10 h-screen sm:p-5'
+      'grid grid-rows-[auto_minmax(0,1fr)_auto] gap-10 h-screen sm:p-5',
+      'gameContainer'
     );
     // restart button
-    const btnContainer = createContainer('grid sm:place-self-end');
+    const btnContainer = createContainer('grid sm:place-self-end', 'restart');
     const restartBtn = createElementWithClasses(
       'button',
-      'p-2 m-2 font-bold rounded-lg bg-blue-900/25 shadow-sm sm:px-4 md:text-lg lg:text-xl lg:px-6 hover:bg-blue-900/40 active:bg-sky-800/50 transition-colors',
-      ['id', 'restart-game']
+      'p-2 m-2 font-bold rounded-lg bg-blue-900/25 shadow-sm sm:px-4 md:text-lg lg:text-xl lg:px-6 hover:bg-blue-900/40 active:bg-sky-800/50 transition-colors'
     );
     restartBtn.textContent = 'Restart';
     btnContainer.appendChild(restartBtn);
@@ -174,20 +174,43 @@ class Template {
     appendChildren(container, [btnContainer, questionContainer, progressBar]);
 
     return container;
-  };
+  }
 
   // ########################################################
-  static createMultipleOptions = function createMultipleOptions(correctAnswer, incorrectAnswers) {};
+  static #createMultipleOptions(correctAnswer, incorrectAnswers) {}
 
   // ########################################################
-  static createBooleanOptions = function createBooleanOptions(correctAnswer, incorrectAnswer) {};
+  static #createBooleanOptions(correctAnswer, incorrectAnswer) {
+    const optionsContainer = createContainer(
+      'grid grid-cols-2 gap-4 content-center p-4 lg:grid-cols-1 lg:grid-rows-[auto_auto] lg:w-[33%] lg:mx-auto'
+    );
+    // true button
+    const trueBtn = createElementWithClasses(
+      'button',
+      'grid h-20 cursor-pointer place-items-center rounded-xl border-2 bg-slate-900 text-center text-lg font-bold capitalize shadow-inner transition-colors hover:bg-green-600/10 active:bg-slate-50/40 data-correct:border-green-600 data-correct:bg-green-600 data-wrong:border-red-500 data-wrong:bg-red-700 data-na:hover:border-green-500 sm:text-2xl lg:w-full',
+      ['data-answer', 'na']
+    );
+    trueBtn.textContent = 'True';
+    // false button
+    const falseBtn = createElementWithClasses(
+      'button',
+      'grid h-20 cursor-pointer place-items-center rounded-xl border-2 bg-slate-900 text-center text-lg font-bold capitalize shadow-inner transition-colors hover:bg-green-600/10 active:bg-slate-50/40 data-correct:border-green-600 data-correct:bg-green-600 data-wrong:border-red-500 data-wrong:bg-red-700 data-na:hover:border-green-500 sm:text-2xl lg:w-full',
+      ['data-answer', 'na']
+    );
+    falseBtn.textContent = 'False';
+
+    appendChildren(optionsContainer, [trueBtn, falseBtn]);
+    console.log(optionsContainer);
+    return optionsContainer;
+  }
 
   // ########################################################
-  static createQuestionContainer = function createQuestionContainer([index, triviaItem]) {
+  static createQuestionContainer([index, triviaItem]) {
     const questionContainer = createContainer(
       'grid mx-4 max-h-full col-start-1 col-end-1 row-start-2 row-end-3 grid-rows-2',
       'question'
     );
+    // question details
     const questionDesc = createContainer(
       'bg-slate-200/10 relative rounded-2xl max-h-full px-2 py-6 lg:p-10 gap-1 grid lg:mx-[10%]'
     );
@@ -196,15 +219,27 @@ class Template {
       'font-bold px-4 py-1 text-xl bg-slate-50 text-slate-800 w-12 h-12 grid place-content-center italic rounded-full absolute top-0 left-10 lg:left-20 -translate-y-2/4 -translate-x-2/4 lg:w-20 lg:h-20 lg:text-3xl',
       ['id', 'index']
     );
-    questionNumber.textContent = `#${index} ${triviaItem.category}`;
+    questionNumber.textContent = `#${index + 1}`;
     const questionText = createElementWithClasses(
       'p',
       'text-center overflow-y-auto font-medium text-lg px-6 pt-6 sm:text-2xl md:text-3xl lg:leading-normal max-h-full'
     );
-    questionText.textContent = triviaItem.question;
+    questionText.innerHTML = triviaItem.question.toString();
     appendChildren(questionDesc, [questionNumber, questionText]);
     questionContainer.appendChild(questionDesc);
-  };
+    // question options
+    let optionsContainer = createContainer();
+
+    if (triviaItem.type === 'boolean') {
+      optionsContainer = this.#createBooleanOptions(
+        triviaItem.correct_answer,
+        triviaItem.incorrect_answers[0]
+      );
+    }
+
+    questionContainer.appendChild(optionsContainer);
+    return questionContainer;
+  }
 }
 
 export default Template;
