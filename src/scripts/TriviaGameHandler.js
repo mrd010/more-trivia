@@ -42,8 +42,6 @@ export const getScore = function getScore() {
   return score;
 };
 
-export const increaseScore = function increaseScore() {};
-
 export const checkAnswer = function checkIfAnswerIsCorrect(answer) {
   return answer === questions[index].correct_answer;
 };
@@ -59,7 +57,10 @@ export const playerChose = function playerChose(chosenAnswer) {
 
 export const getNextQuestion = function getNextQuestion() {
   index += 1;
-  return questions[index];
+  if (questions[index]) {
+    return questions[index];
+  }
+  return null;
 };
 
 export const initiateGame = function initiateGame() {

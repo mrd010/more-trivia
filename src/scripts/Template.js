@@ -123,7 +123,7 @@ class Template {
   static createLandingPage() {
     // create main container
     const container = createContainer(
-      'grid place-content-center w-full h-full duration-500 transition-opacity opacity-100',
+      'grid place-content-center w-full h-full duration-500 transition-all scale-0',
       'landing-page'
     );
     // create header (page title)
@@ -153,16 +153,16 @@ class Template {
   static createGameTemplate() {
     const container = createContainer(
       'grid grid-rows-[auto_minmax(0,1fr)_auto] gap-10 h-screen sm:p-5 duration-500 transition-opacity opacity-0',
-      'gameContainer'
+      'game-container'
     );
-    // restart button
-    const btnContainer = createContainer('grid sm:place-self-end', 'restart');
-    const restartBtn = createElementWithClasses(
+    // home button
+    const btnContainer = createContainer('grid sm:place-self-end', 'home');
+    const homeBtn = createElementWithClasses(
       'button',
       'p-2 m-2 font-bold rounded-lg bg-blue-900/25 shadow-sm sm:px-4 md:text-lg lg:text-xl lg:px-6 hover:bg-blue-900/40 active:bg-sky-800/50 transition-colors'
     );
-    restartBtn.textContent = 'Restart';
-    btnContainer.appendChild(restartBtn);
+    homeBtn.textContent = 'Home Screen';
+    btnContainer.appendChild(homeBtn);
 
     // questions container
     const questionContainer = createContainer(
@@ -273,6 +273,46 @@ class Template {
     questionContainer.appendChild(optionsContainer);
     return questionContainer;
   }
+
+  // ########################################################
+  static createGameOverScreen = function createGameOverScreen(score, maxScore) {
+    const gameOverContainer = createContainer(
+      'grid gap-2 w-full h-full content-center duration-500 text-center sm:w-80 mx-auto transition-opacity opacity-0',
+      'game-over-container'
+    );
+    const title = createElementWithClasses('h2', 'text-4xl p-2 font-bold font-display');
+    // title
+    title.textContent = 'Trivia Quiz Ended';
+    // scoreboard
+    const scoreboard = createContainer('bg-slate-50 p-2 sm:rounded-lg text-slate-950');
+    const scoreboardTitle = createElementWithClasses('p', 'text-lg font-thin text-slate-950/70');
+    scoreboardTitle.textContent = 'Your Score';
+    const scoreContainer = createContainer(
+      'flex gap-2 items-center text-5xl p-1 justify-center opacity-0 transition-opacity duration-500',
+      'score-container'
+    );
+    const currentScoreSpan = createElementWithClasses('span', 'font-semibold', ['id', 'score']);
+    currentScoreSpan.classList.add(
+      `${styles.ratedStyle[Math.floor((score / maxScore) * (styles.ratedStyle.length - 1))]}`
+    );
+    currentScoreSpan.textContent = score;
+    const slash = createElementWithClasses('span', 'text-2xl font-thin');
+    slash.textContent = '/';
+    const maxScoreSpan = createElementWithClasses('span', 'font-semibold', ['id', 'max-score']);
+    maxScoreSpan.textContent = maxScore;
+    appendChildren(scoreContainer, [currentScoreSpan, slash, maxScoreSpan]);
+    appendChildren(scoreboard, [scoreboardTitle, scoreContainer]);
+
+    // home button
+    const homeBtn = createElementWithClasses(
+      'button',
+      'p-3 font-bold rounded-lg bg-blue-900/25 shadow-sm hover:bg-blue-900/40 active:bg-sky-800/50 transition-colors m-4 border-2 border-slate-50 sm:mx-0 md:text-lg lg:text-xl lg:px-6',
+      ['id', 'home-screen-button']
+    );
+    homeBtn.textContent = 'Home Screen';
+    appendChildren(gameOverContainer, [title, scoreboard, homeBtn]);
+    return gameOverContainer;
+  };
 }
 
 export default Template;

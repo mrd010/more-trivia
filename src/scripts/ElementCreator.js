@@ -76,3 +76,8 @@ export const createWeatherIcon = function createWeatherIcon(name, className = ''
   }
   return icon;
 };
+// ############################################################################################################################################################
+
+export const getTransitionTime = function getTransitionTime(element) {
+  return Number(getComputedStyle(element).getPropertyValue('transition-duration').slice(0, -1));
+};
