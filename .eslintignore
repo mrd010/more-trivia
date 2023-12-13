@@ -1,7 +1,0 @@
-node_modules
-dist
-package-lock.json
-webpack
-readme
-tailwind.config.js
-postcss.config.js
