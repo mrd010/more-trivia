@@ -12,7 +12,7 @@ module.exports = merge(common, {
     watchFiles: ['src/*.html'],
     open: true,
     compress: true,
-    hot: true,
+    hot: false,
     liveReload: true,
     historyApiFallback: true,
   },
