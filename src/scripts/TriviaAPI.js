@@ -80,7 +80,8 @@ class TriviaAPI {
     if (triviaData.response_code === 0) {
       return triviaData;
     }
-    throw this.#errorHandler(triviaData.response_code);
+    const error = this.#errorHandler(triviaData.response_code);
+    return error;
   }
 
   // ##############################################################

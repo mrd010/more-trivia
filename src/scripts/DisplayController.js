@@ -1,6 +1,7 @@
 /* eslint-disable no-use-before-define */
 import { getTransitionTime, isOverflown } from './ElementCreator';
 import sleep from './Sleep';
+import { loadSettings, saveSettings } from './StorageController';
 import Template from './Template';
 import TriviaAPI from './TriviaAPI';
 import {
@@ -34,7 +35,11 @@ const hideFormLoading = function hideFormLoading() {
 };
 // ##############################################################
 const displayError = function displayError(error) {
-  console.error(error);
+  const errorContainer = Template.createErrorElement(error.message, error.errorHeader);
+  document.getElementById('start-form-container').appendChild(errorContainer);
+  setTimeout(() => {
+    errorContainer.remove();
+  }, 5000);
 };
 // ##############################################################
 const setMaxAmountInput = async function setMaxAmountInput() {
@@ -98,6 +103,20 @@ const displayGameOverScreen = async function displayGameOverScreen() {
 };
 
 // ##############################################################
+const showConfirmDialogue = function showConfirmDialogue() {
+  const confirmContainer = Template.createConfirmAlert();
+  const gameContainer = document.getElementById('game-container');
+  gameContainer.classList.add('hidden');
+  document.body.appendChild(confirmContainer);
+
+  // events
+  confirmContainer.querySelector('#no-button').addEventListener('click', () => {
+    confirmContainer.remove();
+    gameContainer.classList.remove('hidden');
+  });
+  confirmContainer.querySelector('#yes-button').addEventListener('click', goBackToHome);
+};
+// ##############################################################
 const goToGamePhase = async function goToGamePhase() {
   // remove landing page
   const landingPage = document.getElementById('landing-page');
@@ -114,7 +133,11 @@ const goToGamePhase = async function goToGamePhase() {
   gameTemplate.classList.add('opacity-100');
   trTime = getTransitionTime(gameTemplate);
   await sleep(trTime * 1000 + 10);
-  gameTemplate.querySelector('#home button').addEventListener('click', goBackToHome);
+  gameTemplate.querySelector('#home button').addEventListener('click', () => {
+    if (gameStarted) {
+      showConfirmDialogue();
+    }
+  });
 };
 
 // ##############################################################
@@ -204,7 +227,8 @@ const showStartGameForm = function showStartANewGameForm() {
     return;
   }
   // show form
-  const startGameForm = Template.createStartForm();
+  const settings = loadSettings() || { amount: 10, category: 'any', difficulty: 'any' };
+  const startGameForm = Template.createStartForm(settings);
   const landingPage = document.getElementById('landing-page');
   startGameForm.querySelector('form').classList.add('scale-y-0');
   landingPage.appendChild(startGameForm);
@@ -226,18 +250,27 @@ const showStartGameForm = function showStartANewGameForm() {
       return;
     }
     const formData = Array.from(new FormData(e.target));
-    const amount = formData[0][1];
+    const amount = Number(formData[0][1]);
     const category = formData[1][1];
     const difficulty = formData[2][1];
 
+    let receivedGameData;
     showFormLoading();
-    const receivedGameData = await getGameData(amount, category, difficulty);
-    hideFormLoading();
-    if (receivedGameData) {
-      gameStarted = true;
-      await goToGamePhase();
-      initiateGame();
-      await showNextQuestion();
+    try {
+      receivedGameData = await getGameData(amount, category, difficulty);
+      if (receivedGameData instanceof Error) {
+        throw receivedGameData;
+      } else {
+        hideFormLoading();
+        gameStarted = true;
+        saveSettings({ amount, category, difficulty });
+        await goToGamePhase();
+        initiateGame();
+        await showNextQuestion();
+      }
+    } catch (error) {
+      displayError(error);
+      hideFormLoading();
     }
   });
 };

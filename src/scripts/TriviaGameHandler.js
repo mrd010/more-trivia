@@ -69,16 +69,16 @@ export const initiateGame = function initiateGame() {
 };
 
 export const getGameData = async function getGameData(amount, category, difficulty) {
-  try {
-    // get or create token
-    const token = await TokenAPI.getToken();
-    // get trivia data
-    const triviaData = await TriviaAPI.fetchTriviaData(amount, category, difficulty, token);
-    questions = convertHTMLValues(triviaData.results);
-    console.log(questions);
-
-    return true;
-  } catch (error) {
-    return false;
+  // get or create token
+  const token = await TokenAPI.getToken();
+  if (token instanceof Error) {
+    return token;
   }
+  // get trivia data
+  const triviaData = await TriviaAPI.fetchTriviaData(amount, category, difficulty, token);
+  if (triviaData instanceof Error) {
+    return triviaData;
+  }
+  questions = convertHTMLValues(triviaData.results);
+  return true;
 };

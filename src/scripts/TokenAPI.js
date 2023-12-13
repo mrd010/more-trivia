@@ -12,7 +12,11 @@ class TokenAPI {
       if (previousToken) {
         this.#token = previousToken;
       } else {
-        this.#token = await this.#getNewToken();
+        const newToken = await this.#getNewToken();
+        if (newToken instanceof Error) {
+          return newToken;
+        }
+        this.#token = newToken;
         saveToken(this.#token);
       }
     }
@@ -29,7 +33,7 @@ class TokenAPI {
     if (tokenObject.response_code === 0) {
       return tokenObject.token;
     }
-    throw new Error(tokenObject.response_message);
+    return new Error(tokenObject.response_message);
   }
 
   // ##############################################################

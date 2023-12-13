@@ -9,3 +9,11 @@ export const loadToken = function loadToken() {
 export const removeToken = function removeToken() {
   localStorage.removeItem('token');
 };
+
+export const saveSettings = function saveSettings(settings) {
+  localStorage.setItem('settings', JSON.stringify(settings));
+};
+
+export const loadSettings = function loadSettings() {
+  return JSON.parse(localStorage.getItem('settings'));
+};

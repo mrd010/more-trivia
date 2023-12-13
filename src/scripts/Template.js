@@ -1,11 +1,16 @@
 import lists from './Lists';
-import { createContainer, createElementWithClasses, appendChildren } from './ElementCreator';
+import {
+  createContainer,
+  createElementWithClasses,
+  appendChildren,
+  createMaterialIcon,
+} from './ElementCreator';
 import styles from './Styles';
 
 // ###################################################
 class Template {
   // create start form #########################################
-  static createStartForm() {
+  static createStartForm(settings) {
     const formContainer = createContainer(
       'absolute z-10 rounded-lg w-full h-full grid items-center',
       'start-form-container'
@@ -54,7 +59,7 @@ class Template {
       ['min', '1'],
       ['max', '50'],
       ['step', '1'],
-      ['value', '10'],
+      ['value', settings.amount],
       ['required', true]
     );
     appendChildren(inputField, [label, input]);
@@ -83,6 +88,7 @@ class Template {
       opt.textContent = category;
       input.appendChild(opt);
     });
+    input.value = settings.category;
     appendChildren(inputField, [label, input]);
     startForm.appendChild(inputField);
     // select difficulty
@@ -102,6 +108,7 @@ class Template {
       opt.textContent = text;
       input.appendChild(opt);
     });
+    input.value = settings.difficulty;
     appendChildren(inputField, [label, input]);
     startForm.appendChild(inputField);
     // submit button
@@ -312,6 +319,60 @@ class Template {
     homeBtn.textContent = 'Home Screen';
     appendChildren(gameOverContainer, [title, scoreboard, homeBtn]);
     return gameOverContainer;
+  };
+
+  // ########################################################
+  static createConfirmAlert = function createConfirmAlert() {
+    const confirmContainer = createContainer(
+      'bg-slate-50 text-slate-950 p-4 rounded-lg flex flex-col items-center gap-2 mx-4 sm:w-max sm:justify-self-center',
+      'confirm-container'
+    );
+    const confirmText = createElementWithClasses('p', 'px-4 text-lg');
+    confirmText.textContent = 'Abandon current session and start a new game?';
+    confirmContainer.appendChild(confirmText);
+    // buttons
+    const btnContainer = createContainer('grid grid-cols-2 items-center gap-5 py-2');
+    // yes button
+    const yesBtn = createElementWithClasses(
+      'button',
+      'grid grid-cols-[auto_100px] rounded-md text-slate-50 font-semibold items-center bg-green-700 active:bg-green-800 opacity-90 hover:opacity-100 transition-colors',
+      ['id', 'yes-button']
+    );
+    let btnIcon = createMaterialIcon('rounded', 'px-2', 'close');
+    let btnText = createElementWithClasses('span', 'border-l border-slate-100/40 py-2');
+    btnText.textContent = 'Yes';
+    appendChildren(yesBtn, [btnIcon, btnText]);
+    // no button
+    const noBtn = createElementWithClasses(
+      'button',
+      'grid grid-cols-[auto_100px] rounded-md text-slate-50 font-semibold items-center bg-red-700 active:bg-red-800 opacity-90 hover:opacity-100 transition-colors',
+      ['id', 'no-button']
+    );
+    btnIcon = createMaterialIcon('rounded', 'px-2', 'done');
+    btnText = createElementWithClasses('span', 'border-l border-slate-100/40 py-2');
+    btnText.textContent = 'No';
+    appendChildren(noBtn, [btnIcon, btnText]);
+
+    appendChildren(btnContainer, [yesBtn, noBtn]);
+    confirmContainer.appendChild(btnContainer);
+
+    return confirmContainer;
+  };
+
+  // ########################################################
+  static createErrorElement = function createErrorElement(errorMessage, errorTitle = 'Error') {
+    const errorContainer = createContainer(
+      'fixed top-0 m-6 rounded-lg border-2 border-slate-50 bg-red-700/80 hover:bg-red-700/100 opacity-90 hover:opacity-100 transition-all shadow-md p-2'
+    );
+    const errorHeader = createElementWithClasses(
+      'h3',
+      'text-slate-50 text-lg font-bold md:text-xl'
+    );
+    errorHeader.textContent = errorTitle;
+    const errorText = createElementWithClasses('p', 'text-sm font-medium text-slate-50 md:text-md');
+    errorText.textContent = errorMessage;
+    appendChildren(errorContainer, [errorHeader, errorText]);
+    return errorContainer;
   };
 }
 
